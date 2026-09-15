@@ -71,10 +71,10 @@ public class UserMealsUtil {
     }
 
     private static UserMealWithExcess getUserMealWithExcess(UserMeal meal, Map<LocalDate, Integer> totalCaloriesPerDay, int caloriesPerDay) {
-        LocalDate localDate = meal.getDate();
-        boolean isExxess = totalCaloriesPerDay.getOrDefault(localDate, 0) > caloriesPerDay;
+        LocalDate mealLocalDate = meal.getDate();
+        boolean isExcess = totalCaloriesPerDay.getOrDefault(mealLocalDate, 0) > caloriesPerDay;
         return new UserMealWithExcess(meal.getDateTime(), meal.getDescription(), meal.getCalories(),
-                isExxess);
+                isExcess);
     }
 
 }
