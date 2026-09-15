@@ -35,9 +35,9 @@ public class UserMealsUtil {
 
 
     public static List<UserMealWithExcess> filteredByCycles(List<UserMeal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
-        List<UserMealWithExcess> mealsWithExcess = new ArrayList<>();
-        Map<LocalDate, Integer> totalCaloriesPerDay = getCachedTotalCaloriesByDateWithCycles(meals);
+        Map<LocalDate, Integer> totalCaloriesPerDay = getTotalCaloriesByDateWithCycles(meals);
 
+        List<UserMealWithExcess> mealsWithExcess = new ArrayList<>();
         meals.forEach(meal -> {
             if (TimeUtil.isBetweenHalfOpen(meal.getTime(), startTime, endTime)) {
                 UserMealWithExcess userMealWithExcess = getUserMealWithExcess(meal, totalCaloriesPerDay, caloriesPerDay);
@@ -46,6 +46,15 @@ public class UserMealsUtil {
         });
 
         return mealsWithExcess;
+    }
+
+    private static Map<LocalDate, Integer> getTotalCaloriesByDateWithCycles(List<UserMeal> meals) {
+        Map<LocalDate, Integer> totalCaloriesPerDay = new HashMap<>();
+        meals.forEach(meal -> {
+            LocalDate localDate = meal.getDate();
+            totalCaloriesPerDay.put(localDate, totalCaloriesPerDay.getOrDefault(localDate, 0) + meal.getCalories());
+        });
+        return totalCaloriesPerDay;
     }
 
     public static List<UserMealWithExcess> filteredByStreams(List<UserMeal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
@@ -61,15 +70,6 @@ public class UserMealsUtil {
         boolean isExxess = totalCaloriesPerDay.getOrDefault(localDate, 0) > caloriesPerDay;
         return new UserMealWithExcess(meal.getDateTime(), meal.getDescription(), meal.getCalories(),
                 isExxess);
-    }
-
-    private static Map<LocalDate, Integer> getCachedTotalCaloriesByDateWithCycles(List<UserMeal> meals) {
-        Map<LocalDate, Integer> totalCaloriesPerDay = new HashMap<>();
-        meals.forEach(meal -> {
-            LocalDate localDate = meal.getDate();
-            totalCaloriesPerDay.put(localDate, totalCaloriesPerDay.getOrDefault(localDate, 0) + meal.getCalories());
-        });
-        return totalCaloriesPerDay;
     }
 
     private static Map<LocalDate, Integer> getCachedTotalCaloriesByDateWithStreams(List<UserMeal> meals) {
