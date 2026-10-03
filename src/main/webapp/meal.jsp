@@ -1,5 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%-- @elvariable id="meal" type="ru.javawebinar.topjava.model.Meal" --%>
+
 <html>
 <head>
     <title>Meal</title>
@@ -16,6 +18,7 @@
 
 <h3><a href="index.html">Home</a></h3>
 <hr>
+
 <h2>${meal.id != null ? 'Edit' : 'New'} Meal</h2>
 
 <form method="POST" action='meals' name="formMeal">
