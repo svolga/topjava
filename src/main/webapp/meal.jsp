@@ -1,7 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%-- @elvariable id="meal" type="ru.javawebinar.topjava.model.Meal" --%>
-
+<jsp:useBean id="meal" scope="request" type="ru.javawebinar.topjava.model.Meal"/>
 <html>
 <head>
     <title>Meal</title>
