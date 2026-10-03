@@ -32,6 +32,7 @@ JSP
 JSTL: Шаблоны для разработки веб-приложений в java
 Основные возможности JSTL
 JSTL LocalDateTime format
+
 Optional
 2. Реализуем в ПАМЯТИ (любая коллекция) CRUD (create/read/update/delete) для еды
    Пример: Simple CRUD using Servlet/JSP
