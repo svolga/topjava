@@ -30,18 +30,18 @@
         </tr>
 
         <tr>
-            <td>DateTime :</td>
-            <td><input type="datetime-local" name="dateTime" value="<c:out value="${meal.dateTime}" />"/></td>
+            <td><label for="dateTime">DateTime :</label></td>
+            <td><input type="datetime-local" id="dateTime" name="dateTime" value="<c:out value="${meal.dateTime}" />"/></td>
         </tr>
         <tr>
-            <td>Description :</td>
+            <td><label for="description">Description :</label></td>
             <td><input
-                    type="text" name="description"
+                    type="text" id="description" name="description"
                     value="<c:out value="${meal.description}" />"/></td>
         </tr>
         <tr>
-            <td>Calories :</td>
-            <td><input type="number" name="calories"
+            <td><label for="calories">Calories :</label></td>
+            <td><input type="number" id="calories" name="calories"
                        value="<c:out value="${meal.calories}" />"/></td>
         </tr>
         <tr>
