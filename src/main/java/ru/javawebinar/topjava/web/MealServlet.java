@@ -26,9 +26,10 @@ public class MealServlet extends HttpServlet {
 
     private static final String PAGE_LIST = "/meals.jsp";
     private static final String PAGE_NEW_EDIT = "/meal.jsp";
-    private final MealService mealService;
+    private MealService mealService;
 
-    public MealServlet() {
+    @Override
+    public void init() throws ServletException {
         mealService = new MealServiceImpl();
     }
 
@@ -37,35 +38,32 @@ public class MealServlet extends HttpServlet {
 
         String forward;
         String action = request.getParameter("action");
+        action = action == null ? "" : action;
         log.debug("redirect to meals, action -> {}", action);
 
-        if ("delete".equalsIgnoreCase(action)){
-            int id = Integer.parseInt(request.getParameter("id"));
-            mealService.delete(id);
-
-            List<Meal> meals = mealService.getAll();
-            List<MealTo> mealsTo = MealsUtil.filteredByStreams(meals, LocalTime.of(7, 0), LocalTime.of(12, 0), LIMIT_CALORIES_PER_DAY);
-            request.setAttribute("meals", mealsTo);
-            forward = PAGE_LIST;
+        switch (action) {
+            case "delete":
+                int deletedId = Integer.parseInt(request.getParameter("id"));
+                mealService.delete(deletedId);
+                response.sendRedirect("meals");
+                return;
+            case "new":
+                forward = PAGE_NEW_EDIT;
+                Meal newMeal = new Meal(null, LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), null, 0);
+                request.setAttribute("meal", newMeal);
+                break;
+            case "edit":
+                forward = PAGE_NEW_EDIT;
+                int editedId = Integer.parseInt(request.getParameter("id"));
+                Meal meal = mealService.get(editedId);
+                request.setAttribute("meal", meal);
+                break;
+            default:
+                forward = PAGE_LIST;
+                List<Meal> meals = mealService.getAll();
+                List<MealTo> mealsTo = MealsUtil.filteredByStreams(meals, LocalTime.of(7, 0), LocalTime.of(12, 0), LIMIT_CALORIES_PER_DAY);
+                request.setAttribute("meals", mealsTo);
         }
-        else if ("new".equalsIgnoreCase(action)){
-            Meal meal = new Meal(null, LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), null, 0);
-            request.setAttribute("meal", meal);
-            forward =  PAGE_NEW_EDIT;
-        }
-        else if ("edit".equalsIgnoreCase(action)){
-            int id = Integer.parseInt(request.getParameter("id"));
-            Meal meal = mealService.get(id);
-            request.setAttribute("meal", meal);
-            forward = PAGE_NEW_EDIT;
-        }
-        else{
-            List<Meal> meals = mealService.getAll();
-            List<MealTo> mealsTo = MealsUtil.filteredByStreams(meals, LocalTime.of(7, 0), LocalTime.of(12, 0), LIMIT_CALORIES_PER_DAY);
-            request.setAttribute("meals", mealsTo);
-            forward = PAGE_LIST;
-        }
-
         RequestDispatcher view = request.getRequestDispatcher(forward);
         view.forward(request, response);
     }
@@ -81,16 +79,12 @@ public class MealServlet extends HttpServlet {
         int calories = Integer.parseInt(request.getParameter("calories"));
 
         Meal meal = new Meal(id, dateTime, description, calories);
-
         if (meal.getId() == null) {
             mealService.add(meal);
-        }
-        else {
+        } else {
             mealService.update(meal);
         }
 
         response.sendRedirect("meals");
     }
-
-
 }

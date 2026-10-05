@@ -10,10 +10,10 @@ public interface MealService {
 
     Meal get(int id);
 
-    void add(Meal meal);
+    Meal add(Meal meal);
 
     void delete(int id);
 
-    void update(Meal meal);
+    Meal update(Meal meal);
 
 }

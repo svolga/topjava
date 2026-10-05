@@ -18,7 +18,7 @@
 <h3><a href="index.html">Home</a></h3>
 <hr>
 
-<h2>${meal.id != null ? 'Edit' : 'New'} Meal</h2>
+<h2>${meal.id >0  ? 'Edit' : 'New'} Meal</h2>
 
 <form method="POST" action='meals' name="formMeal">
 
@@ -31,8 +31,10 @@
 
         <tr>
             <td><label for="dateTime">DateTime :</label></td>
-            <td><input type="datetime-local" id="dateTime" name="dateTime" value="<c:out value="${meal.dateTime}" />"/></td>
+            <td><input type="datetime-local" id="dateTime" name="dateTime" value="<c:out value="${meal.dateTime}" />"/>
+            </td>
         </tr>
+
         <tr>
             <td><label for="description">Description :</label></td>
             <td><input
