@@ -38,30 +38,34 @@ public class MealServlet extends HttpServlet {
 
         String forward;
         String action = request.getParameter("action");
-        action = action == null ? "" : action;
+        action = action == null ? "list" : action;
         log.debug("redirect to meals, action -> {}", action);
 
         switch (action) {
             case "delete":
                 int deletedId = Integer.parseInt(request.getParameter("id"));
                 mealService.delete(deletedId);
+                log.debug("deleted meals with id -> {}", deletedId);
                 response.sendRedirect("meals");
                 return;
             case "new":
                 forward = PAGE_NEW_EDIT;
                 Meal newMeal = new Meal(null, LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), null, 0);
                 request.setAttribute("meal", newMeal);
+                log.debug("try to add new meal -> {}", newMeal);
                 break;
             case "edit":
                 forward = PAGE_NEW_EDIT;
                 int editedId = Integer.parseInt(request.getParameter("id"));
                 Meal meal = mealService.get(editedId);
                 request.setAttribute("meal", meal);
+                log.debug("edit meal -> {}", meal);
                 break;
             default:
                 forward = PAGE_LIST;
                 List<Meal> meals = mealService.getAll();
                 List<MealTo> mealsTo = MealsUtil.filteredByStreams(meals, LocalTime.of(7, 0), LocalTime.of(12, 0), LIMIT_CALORIES_PER_DAY);
+                log.debug("list meals, count -> {}", mealsTo.size());
                 request.setAttribute("meals", mealsTo);
         }
         RequestDispatcher view = request.getRequestDispatcher(forward);
@@ -79,9 +83,11 @@ public class MealServlet extends HttpServlet {
 
         Meal meal = new Meal(id, dateTime, description, calories);
         if (meal.getId() == null) {
-            mealService.add(meal);
+            Meal addedMeal = mealService.add(meal);
+            log.debug("added meal -> {}", addedMeal);
         } else {
-            mealService.update(meal);
+            Meal updatedMeal = mealService.update(meal);
+            log.debug("updated meal -> {}", updatedMeal);
         }
 
         response.sendRedirect("meals");

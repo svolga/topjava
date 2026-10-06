@@ -18,7 +18,7 @@
 <h3><a href="index.html">Home</a></h3>
 <hr>
 
-<h2>${meal.id >0  ? 'Edit' : 'New'} Meal</h2>
+<h2>${meal.id != null  ? 'Edit' : 'New'} Meal</h2>
 
 <form method="POST" action='meals' name="formMeal">
 

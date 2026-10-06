@@ -46,9 +46,9 @@ public class MealServiceImpl implements MealService {
 
     @Override
     public Meal add(Meal meal) {
-        int id = lastId.incrementAndGet();
-        meal.setId(id);
-        return meals.put(id, meal);
+        int newId = lastId.incrementAndGet();
+        meal.setId(newId);
+        return meals.computeIfAbsent(newId, id -> meal);
     }
 
     @Override

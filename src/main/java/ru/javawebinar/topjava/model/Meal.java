@@ -48,4 +48,14 @@ public class Meal {
     public int getCalories() {
         return calories;
     }
+
+    @Override
+    public String toString() {
+        return "Meal{" +
+                "id=" + id +
+                ", dateTime=" + dateTime +
+                ", description='" + description + '\'' +
+                ", calories=" + calories +
+                '}';
+    }
 }
