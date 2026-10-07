@@ -11,12 +11,12 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class MealServiceImpl implements MealService {
+public class MealServiceMemoryImpl implements MealService {
 
     private final Map<Integer, Meal> meals = new ConcurrentHashMap<>();
     private final AtomicInteger lastId = new AtomicInteger();
 
-    public MealServiceImpl() {
+    public MealServiceMemoryImpl() {
 
         List<Meal> meals = Arrays.asList(
                 new Meal(getNewId(), LocalDateTime.of(2020, Month.JANUARY, 30, 10, 0), "Завтрак", 500),
@@ -48,7 +48,8 @@ public class MealServiceImpl implements MealService {
     public Meal add(Meal meal) {
         int newId = lastId.incrementAndGet();
         meal.setId(newId);
-        return meals.computeIfAbsent(newId, id -> meal);
+        meals.put(newId, meal);
+        return meal;
     }
 
     @Override
