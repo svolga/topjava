@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.model.MealTo;
 import ru.javawebinar.topjava.service.MealService;
-import ru.javawebinar.topjava.service.MealServiceMemoryImpl;
+import ru.javawebinar.topjava.service.MemoryMealService;
 import ru.javawebinar.topjava.util.MealsUtil;
 
 import javax.servlet.RequestDispatcher;
@@ -30,7 +30,7 @@ public class MealServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        mealService = new MealServiceMemoryImpl();
+        mealService = new MemoryMealService();
     }
 
     @Override
