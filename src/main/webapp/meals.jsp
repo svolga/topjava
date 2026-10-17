@@ -17,10 +17,45 @@
     </style>
 </head>
 <body>
+<script type="text/javascript">
+
+</script>
+
 <section>
     <h3><a href="index.html">Home</a></h3>
     <hr/>
-    <h2>Meals</h2>
+    <h2>Meals for userId =  ${currentUserId}</h2>
+
+
+    <form id="filter">
+        <div class="row">
+            <div>
+                <label for="startDate">Start date:</label>
+                <input class="form-control" type="date" name="startDate" id="startDate" value="${param.startDate}">
+            </div>
+            <div>
+                <label for="endDate">End date</label>
+                <input class="form-control" type="date" name="endDate" id="endDate" value="${param.endDate}">
+            </div>
+            <div>
+                <label for="startTime">Start time</label>
+                <input class="form-control" type="time" name="startTime" id="startTime" value="${param.startTime}">
+            </div>
+            <div>
+                <label for="endTime">End time</label>
+                <input class="form-control" type="time" name="endTime" id="endTime" value="${param.endTime}">
+            </div>
+        </div>
+
+        <div>
+            <button type="submit">Submit</button>
+            <button type="submit" name="action" value="reset" >Reset</button>
+        </div>
+
+    </form>
+
+
+
     <a href="meals?action=create">Add Meal</a>
     <br><br>
     <table border="1" cellpadding="8" cellspacing="0">
@@ -34,7 +69,7 @@
         </tr>
         </thead>
         <c:forEach items="${requestScope.meals}" var="meal">
-            <jsp:useBean id="meal" type="ru.javawebinar.topjava.model.MealTo"/>
+            <jsp:useBean id="meal" type="ru.javawebinar.topjava.to.MealTo"/>
             <tr class="${meal.excess ? 'excess' : 'normal'}">
                 <td>
                         <%--${meal.dateTime.toLocalDate()} ${meal.dateTime.toLocalTime()}--%>
