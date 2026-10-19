@@ -92,7 +92,6 @@ public class MealServlet extends HttpServlet {
                 LocalTime endTime = getLocalTime(request, END_TIME);
 
                 List<MealTo> mealTos = mealRestController.getFiltered(startDate, endDate, startTime, endTime);
-                request.setAttribute("currentUserId", currentUserId);
                 request.setAttribute("meals", mealTos);
                 request.getRequestDispatcher("/meals.jsp").forward(request, response);
                 break;

@@ -7,10 +7,13 @@ import ru.javawebinar.topjava.util.DateTimeUtil;
 import ru.javawebinar.topjava.util.MealsUtil;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -18,6 +21,7 @@ import java.util.stream.Collectors;
 public class InMemoryMealRepository implements MealRepository {
     private final Map<Integer, Meal> mealsMap = new ConcurrentHashMap<>();
     private final AtomicInteger counter = new AtomicInteger(0);
+    private final Map<Integer, Set<Integer>> users = new ConcurrentHashMap<>();
 
     {
         MealsUtil.meals.forEach(meal -> save(meal, meal.getUserId()));
@@ -29,6 +33,8 @@ public class InMemoryMealRepository implements MealRepository {
             meal.setId(counter.incrementAndGet());
             meal.setUserId(userId);
             mealsMap.put(meal.getId(), meal);
+            users.computeIfAbsent(userId, k -> new ConcurrentSkipListSet<>());
+            users.get(userId).add(meal.getId());
             return meal;
         }
 
@@ -40,14 +46,11 @@ public class InMemoryMealRepository implements MealRepository {
         return mealsMap.computeIfPresent(meal.getId(), (id, oldMeal) -> meal);
     }
 
-    private boolean validateNotNullAndBelongToUser(Meal meal, int userId) {
-        return meal != null && meal.getUserId() == userId;
-    }
-
     @Override
     public boolean delete(int id, int userId) {
         Meal meal = mealsMap.get(id);
         if (validateNotNullAndBelongToUser(meal, userId)) {
+            users.get(userId).remove(meal.getId());
             return mealsMap.remove(id) != null;
         }
         return false;
@@ -62,20 +65,23 @@ public class InMemoryMealRepository implements MealRepository {
         return null;
     }
 
+    private boolean validateNotNullAndBelongToUser(Meal meal, int userId) {
+        return meal != null && meal.getUserId() == userId;
+    }
+
     @Override
     public List<Meal> getAll(int userId) {
-        return mealsMap.values().stream()
-                .filter(meal -> meal.getUserId() == userId)
-                .collect(Collectors.toList());
+        return getFilteredByDates(null, null, userId);
     }
 
     @Override
     public List<Meal> getFilteredByDates(LocalDate startDate, LocalDate endDate, int userId) {
-        List<Meal> meals = getAll(userId);
+        List<Meal> meals = new ArrayList<>();
+        users.get(userId).forEach(id -> meals.add(mealsMap.get(id)));
+
         return meals.stream()
                 .filter(meal -> DateTimeUtil.isBetweenDates(meal.getDate(), startDate, endDate))
                 .sorted(Comparator.comparing(Meal::getDate).reversed())
                 .collect(Collectors.toList());
     }
 }
-

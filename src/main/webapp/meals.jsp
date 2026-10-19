@@ -24,7 +24,7 @@
 <section>
     <h3><a href="index.html">Home</a></h3>
     <hr/>
-    <h2>Meals for userId =  ${currentUserId}</h2>
+    <h2>Meals</h2>
 
 
     <form id="filter">

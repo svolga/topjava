@@ -49,7 +49,8 @@ public class InMemoryUserRepository implements UserRepository {
     public List<User> getAll() {
         log.info("getAll");
         return usersMap.values().stream()
-                .sorted(Comparator.comparing(User::getName, String::compareToIgnoreCase))
+                .sorted(Comparator.comparing(User::getName)
+                        .thenComparing(User::getEmail, String::compareToIgnoreCase))
                 .collect(Collectors.toList());
     }
 
@@ -61,5 +62,4 @@ public class InMemoryUserRepository implements UserRepository {
                 .findFirst()
                 .orElse(null);
     }
-
 }

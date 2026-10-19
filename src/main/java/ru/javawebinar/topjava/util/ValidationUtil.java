@@ -39,19 +39,4 @@ public class ValidationUtil {
             throw new IllegalArgumentException(entity + " must be with id=" + id);
         }
     }
-
-    public static <T> T checkNotFoundWithId(T object, int id) {
-        checkNotFoundWithId(object != null, id);
-        return object;
-    }
-
-    public static void checkNotFoundWithId(boolean found, int id) {
-        checkNotFound(found, "id=" + id);
-    }
-
-    public static void checkNew(AbstractBaseEntity entity) {
-        if (!entity.isNew()) {
-            throw new IllegalArgumentException(entity + " must be new (id = null)");
-        }
-    }
 }

@@ -19,7 +19,7 @@ import static ru.javawebinar.topjava.util.ValidationUtil.checkIsNew;
 @Controller
 public class MealRestController {
 
-    Logger log = LoggerFactory.getLogger(getClass());
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     private final MealService service;
 
@@ -31,15 +31,15 @@ public class MealRestController {
         int currentUserId = SecurityUtil.authUserId();
         log.info("create meal for user -> {}", currentUserId);
         checkIsNew(meal);
-        return service.save(meal, currentUserId);
+        return service.create(meal, currentUserId);
     }
 
-    public Meal update(Meal meal, int id) {
+    public void update(Meal meal, int id) {
         int currentUserId = SecurityUtil.authUserId();
         log.info("update meal for user -> {}", currentUserId);
-        meal.setUserId(currentUserId);
         assureIdConsistent(meal, id);
-        return service.save(meal, SecurityUtil.authUserId());
+        meal.setUserId(currentUserId);
+        service.update(meal, SecurityUtil.authUserId());
     }
 
     public Meal get(int id) {
@@ -56,19 +56,17 @@ public class MealRestController {
     public List<MealTo> getAll() {
         int currentUserId = SecurityUtil.authUserId();
         List<Meal> meals = service.getAll(currentUserId);
-        log.info("currentUserId -> {}, meals -> {}", currentUserId, meals);
+        log.debug("currentUserId -> {}, meals -> {}", currentUserId, meals);
         return MealsUtil.getTos(meals, MealsUtil.DEFAULT_CALORIES_PER_DAY);
     }
 
     public List<MealTo> getFiltered(LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime) {
         int currentUserId = SecurityUtil.authUserId();
         List<Meal> meals = service.getFilteredByDates(startDate, endDate, currentUserId);
-        log.info("Filtered by dates: startDate->{}, endDate->{}, currentUserId->{}, meals -> {}", startDate, endDate,
+        log.debug("Filtered by dates: startDate->{}, endDate->{}, currentUserId->{}, meals -> {}", startDate, endDate,
                 currentUserId, meals);
         List<MealTo> mealTos = MealsUtil.getFilteredTos(meals, MealsUtil.DEFAULT_CALORIES_PER_DAY, startTime, endTime);
-        log.info("Filtered by times: startTime -> {}, endTime -> {}, mealTos -> {}", startTime, endTime, mealTos);
+        log.debug("Filtered by times: startTime -> {}, endTime -> {}, mealTos -> {}", startTime, endTime, mealTos);
         return mealTos;
     }
-
-
 }
