@@ -14,8 +14,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 @Repository
@@ -23,7 +23,6 @@ public class InMemoryMealRepository implements MealRepository {
     private final Map<Integer, Meal> mealsMap = new ConcurrentHashMap<>();
     private final AtomicInteger counter = new AtomicInteger(0);
     private final Map<Integer, Set<Integer>> users = new ConcurrentHashMap<>();
-    private final ReentrantLock lock = new ReentrantLock();
 
     {
         MealsUtil.meals.forEach(meal -> save(meal, meal.getUserId()));
@@ -52,13 +51,8 @@ public class InMemoryMealRepository implements MealRepository {
     public boolean delete(int id, int userId) {
         Meal meal = mealsMap.get(id);
         if (validateNotNullAndBelongToUser(meal, userId)) {
-            lock.lock();
-            try {
-                users.get(userId).remove(meal.getId());
-                return mealsMap.remove(id) != null;
-            } finally {
-                lock.unlock();
-            }
+            users.get(userId).remove(meal.getId());
+            return mealsMap.remove(id) != null;
         }
         return false;
     }
@@ -73,12 +67,7 @@ public class InMemoryMealRepository implements MealRepository {
     }
 
     private boolean validateNotNullAndBelongToUser(Meal meal, int userId) {
-        lock.lock();
-        try {
-            return meal != null && meal.getUserId() == userId;
-        } finally {
-            lock.unlock();
-        }
+        return meal != null && meal.getUserId() == userId;
     }
 
     @Override
@@ -88,12 +77,15 @@ public class InMemoryMealRepository implements MealRepository {
 
     @Override
     public List<Meal> getFilteredByDates(LocalDate startDate, LocalDate endDate, int userId) {
-        return  filterByDates(startDate, endDate, userId);
+        return filterByDates(startDate, endDate, userId);
     }
 
     private List<Meal> filterByDates(LocalDate startDate, LocalDate endDate, int userId) {
         List<Meal> meals = new ArrayList<>();
-        users.get(userId).forEach(id -> meals.add(mealsMap.get(id)));
+        Set<Integer> mealIds = new CopyOnWriteArraySet<>(users.get(userId));
+        for (Integer mealId : mealIds) {
+            meals.add(mealsMap.get(mealId));
+        }
 
         return meals.stream()
                 .filter(meal -> DateTimeUtil.isBetweenDates(meal.getDate(), startDate, endDate))
