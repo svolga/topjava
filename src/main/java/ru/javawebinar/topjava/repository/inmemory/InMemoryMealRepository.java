@@ -11,10 +11,11 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -48,16 +49,6 @@ public class InMemoryMealRepository implements MealRepository {
     }
 
     @Override
-    public boolean delete(int id, int userId) {
-        Meal meal = mealsMap.get(id);
-        if (validateNotNullAndBelongToUser(meal, userId)) {
-            users.get(userId).remove(meal.getId());
-            return mealsMap.remove(id) != null;
-        }
-        return false;
-    }
-
-    @Override
     public Meal get(int id, int userId) {
         Meal meal = mealsMap.get(id);
         if (validateNotNullAndBelongToUser(meal, userId)) {
@@ -68,6 +59,18 @@ public class InMemoryMealRepository implements MealRepository {
 
     private boolean validateNotNullAndBelongToUser(Meal meal, int userId) {
         return meal != null && meal.getUserId() == userId;
+    }
+
+    @Override
+    public boolean delete(int id, int userId) {
+        Meal meal = mealsMap.get(id);
+        if (validateNotNullAndBelongToUser(meal, userId)) {
+            users.get(userId).remove(meal.getId());
+            Meal result = mealsMap.remove(id);
+            System.out.println("Remove meal " + id + " from mealsMap");
+            return result != null;
+        }
+        return false;
     }
 
     @Override
@@ -82,12 +85,13 @@ public class InMemoryMealRepository implements MealRepository {
 
     private List<Meal> filterByDates(LocalDate startDate, LocalDate endDate, int userId) {
         List<Meal> meals = new ArrayList<>();
-        Set<Integer> mealIds = new CopyOnWriteArraySet<>(users.get(userId));
+        Set<Integer> mealIds = new TreeSet<>(users.get(userId));
         for (Integer mealId : mealIds) {
-            meals.add(mealsMap.get(mealId));
+            Meal meal = mealsMap.get(mealId);
+            meals.add(meal);
         }
-
         return meals.stream()
+                .filter(Objects::nonNull)
                 .filter(meal -> DateTimeUtil.isBetweenDates(meal.getDate(), startDate, endDate))
                 .sorted(Comparator.comparing(Meal::getDate).reversed())
                 .collect(Collectors.toList());
