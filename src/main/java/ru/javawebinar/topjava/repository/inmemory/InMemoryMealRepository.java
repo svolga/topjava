@@ -9,6 +9,7 @@ import ru.javawebinar.topjava.util.MealsUtil;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -67,7 +68,6 @@ public class InMemoryMealRepository implements MealRepository {
         if (validateNotNullAndBelongToUser(meal, userId)) {
             users.get(userId).remove(meal.getId());
             Meal result = mealsMap.remove(id);
-            System.out.println("Remove meal " + id + " from mealsMap");
             return result != null;
         }
         return false;
@@ -85,7 +85,8 @@ public class InMemoryMealRepository implements MealRepository {
 
     private List<Meal> filterByDates(LocalDate startDate, LocalDate endDate, int userId) {
         List<Meal> meals = new ArrayList<>();
-        Set<Integer> mealIds = new TreeSet<>(users.get(userId));
+        users.computeIfAbsent(userId, k -> new ConcurrentSkipListSet<>());
+        Set<Integer> mealIds = new HashSet<>(users.get(userId));
         for (Integer mealId : mealIds) {
             Meal meal = mealsMap.get(mealId);
             meals.add(meal);
