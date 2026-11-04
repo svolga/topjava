@@ -1,7 +1,8 @@
 
-# Домашнее задание HW0
+# Домашнее задание HW3
 
-Реализовать метод UserMealsUtil.filteredByCycles через циклы (forEach):
-
-должны возвращаться только записи между startTime и endTime
-поле UserMealWithExcess.excess должно показывать, превышает ли сумма калорий за весь день значение caloriesPerDay
+1. Понять, почему перестали работать SpringMain, InMemoryAdminRestControllerTest, InMemoryAdminRestControllerSpringTest. Чиним в Optional.
+2. Дополнить скрипты создания и инициализации базы таблицей meals.
+3. Реализовать через Spring JDBC Template JdbcMealRepository
+4. Проверить работу MealServlet, запустив приложение
+5. Сделать MealServiceTest из MealService и реализовать тесты для JdbcMealRepository
