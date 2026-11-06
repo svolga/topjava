@@ -15,16 +15,17 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 import java.util.List;
 
 import static org.junit.Assert.assertThrows;
-import static ru.javawebinar.topjava.MealTestData.ADMIN_ID;
 import static ru.javawebinar.topjava.MealTestData.assertMatch;
 import static ru.javawebinar.topjava.MealTestData.getNew;
 import static ru.javawebinar.topjava.MealTestData.getSortedAdminMeals;
 import static ru.javawebinar.topjava.MealTestData.getSortedUserMeals;
 import static ru.javawebinar.topjava.MealTestData.getUpdated;
+import static ru.javawebinar.topjava.MealTestData.userMeal1;
+
 import static ru.javawebinar.topjava.MealTestData.MEAL_NOT_FOUND;
 import static ru.javawebinar.topjava.MealTestData.MEAL_START_ID;
-import static ru.javawebinar.topjava.MealTestData.USER_ID;
-import static ru.javawebinar.topjava.MealTestData.userMeal1;
+import static ru.javawebinar.topjava.UserTestData.ADMIN_ID;
+import static ru.javawebinar.topjava.UserTestData.USER_ID;
 
 @ContextConfiguration({
         "classpath:spring/spring-app.xml",
@@ -60,6 +61,11 @@ public class MealServiceTest {
     }
 
     @Test
+    public void deleteNotOwnMeal() {
+        assertThrows(NotFoundException.class, () -> service.delete(MEAL_START_ID, ADMIN_ID));
+    }
+
+    @Test
     public void deletedNotFound() {
         assertThrows(NotFoundException.class, () -> service.delete(MEAL_NOT_FOUND, USER_ID));
     }
@@ -68,6 +74,11 @@ public class MealServiceTest {
     public void get() {
         Meal meal = service.get(MEAL_START_ID, USER_ID);
         assertMatch(meal, userMeal1);
+    }
+
+    @Test
+    public void getNotOwnMeal() {
+        assertThrows(NotFoundException.class, () -> service.get(MEAL_START_ID, ADMIN_ID));
     }
 
     @Test
@@ -80,6 +91,12 @@ public class MealServiceTest {
         Meal updated = getUpdated();
         service.update(updated, USER_ID);
         assertMatch(service.get(MEAL_START_ID, USER_ID), getUpdated());
+    }
+
+    @Test
+    public void updateNotOwnMeal() {
+        Meal updated = getUpdated();
+        assertThrows(NotFoundException.class, () -> service.update(updated, ADMIN_ID));
     }
 
     @Test
@@ -101,9 +118,9 @@ public class MealServiceTest {
     }
 
     @Test
-    public void updateNotOwnMeal() {
+    public void updateNotExistMeal() {
         Meal updated = getUpdated();
-        updated.setId(10);
+        updated.setId(MEAL_NOT_FOUND);
         assertThrows(NotFoundException.class, () -> service.update(updated, USER_ID));
     }
 }
