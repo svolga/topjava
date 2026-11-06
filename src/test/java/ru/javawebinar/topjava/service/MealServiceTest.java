@@ -62,7 +62,7 @@ public class MealServiceTest {
 
     @Test
     public void deleteNotOwnMeal() {
-        assertThrows(NotFoundException.class, () -> service.delete(MEAL_START_ID, ADMIN_ID));
+        assertThrows(NotFoundException.class, () -> service.delete(userMeal1.getId(), ADMIN_ID));
     }
 
     @Test
@@ -78,7 +78,7 @@ public class MealServiceTest {
 
     @Test
     public void getNotOwnMeal() {
-        assertThrows(NotFoundException.class, () -> service.get(MEAL_START_ID, ADMIN_ID));
+        assertThrows(NotFoundException.class, () -> service.get(userMeal1.getId(), ADMIN_ID));
     }
 
     @Test
